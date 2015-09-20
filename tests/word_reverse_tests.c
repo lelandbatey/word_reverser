@@ -30,6 +30,7 @@ char* remove_newline(char* line){
 
 char* test_tick_file_many(){
 	int i = 0;
+	// Number of lines to be reversing at once
 	int sim_count = 20;
 
 	FILE *fp = fopen("./lines.txt", "r");
@@ -44,14 +45,12 @@ char* test_tick_file_many(){
 	while (1){
 		// Get `sim_count` strings from files, turning them into SWR structs.
 		for (i = 0; i < sim_count; ++i){
-			// printf("Attempting to read a line\n");
 			read = getline(&line, &len, fp);
 			if (read == -1){
 				fclose(fp);
 				return;
 			}
 			remove_newline(line);
-			// printf("Got a line: '%s'\n", line);
 			lines[i] = new_swr(line);
 			free(line);
 			line = 0;
