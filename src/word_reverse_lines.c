@@ -72,7 +72,7 @@ int reverse_file(char* file_path, int simul_count){
 		}
 	}
 	fclose(fp);
-	return NULL;
+	return 0;
 }
 
 
