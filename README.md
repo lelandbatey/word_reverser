@@ -3,6 +3,10 @@ Word Reverser
 
 This is a small and simple program to reverse the words in a string. For example, the phrase "there are words everywhere" becomes "everywhere words are there". It supports a couple different reversal algorithms, as well as demonstrations of each algorithm.
 
+An example of the program in action:
+
+![Wordreverse in action (archive image here: http://nacr.us/media/pics/wordreverse_anim10_imagemagick.gif)](http://i.imgur.com/MJ5z5Gs.gif)
+
 
 Building the Project
 --------------------
