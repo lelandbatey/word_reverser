@@ -33,7 +33,6 @@ int reverse_file(char* file_path, int simul_count){
 	int i = 0;
 
 	FILE *fp = fopen(file_path, "r");
-	int count = 0;
 	char* line = 0;
 	StrWordRev* lines[simul_count];
 
@@ -54,15 +53,18 @@ int reverse_file(char* file_path, int simul_count){
 			line = 0;
 		}
 		while (!all_complete(lines, simul_count)){
+			// Move the cursor to the "top" of the block
 			for (i = 0; i < simul_count; ++i){
 				printf("\033[1A");
 				printf("\033[1A");
 				printf("\r");
 			}
+			// Conduct a single "tick" of the reversal of each string
 			for (i = 0; i < simul_count; ++i){
 				if (lines[i]->state != COMPLETE){
 					tick_reverse_word(lines[i]);
 				}
+				// Print each string with it's fancy highlighting
 				rev_debug_print(lines[i]->raw_str, lines[i]->a, lines[i]->b);
 			}
 			usleep(50000);

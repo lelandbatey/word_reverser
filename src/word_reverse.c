@@ -115,6 +115,7 @@ void print_word(char* in_string){
 }
 
 char* get_word_pos(char* in_string, int n){
+	char* original_in_str = in_string;
 	int within_word = 0,
 	    count = 0;
     while (*in_string != '\0'){
@@ -133,6 +134,7 @@ char* get_word_pos(char* in_string, int n){
     	}
     	in_string++;
     }
+	log_err("Couldn't find nth word of string where n is %d and string is '%s'", n, original_in_str);
     return 0;
 }
 

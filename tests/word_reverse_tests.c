@@ -28,102 +28,69 @@ char* remove_newline(char* line){
 	return line;
 }
 
-char* test_tick_file_many(){
-	int i = 0;
-	// Number of lines to be reversing at once
-	int sim_count = 20;
 
-	FILE *fp = fopen("./lines.txt", "r");
-	int count = 0;
-	char* line = 0;
-	StrWordRev* lines[sim_count];
-
-	size_t len = 0;
-	ssize_t read;
-
-	// printf("Begin visualization.\n");
-	while (1){
-		// Get `sim_count` strings from files, turning them into SWR structs.
-		for (i = 0; i < sim_count; ++i){
-			read = getline(&line, &len, fp);
-			if (read == -1){
-				fclose(fp);
-				return;
-			}
-			remove_newline(line);
-			lines[i] = new_swr(line);
-			free(line);
-			line = 0;
-		}
-		while (!all_complete(lines, sim_count)){
-			for (i = 0; i < sim_count; ++i){
-				printf("\033[1A");
-				printf("\033[1A");
-				printf("\r");
-			}
-			for (i = 0; i < sim_count; ++i){
-				if (lines[i]->state != COMPLETE){
-					tick_reverse_word(lines[i]);
-				}
-				rev_debug_print(lines[i]->raw_str, lines[i]->a, lines[i]->b);
-			}
-			usleep(50000);
-		}
-		for (i = 0; i < sim_count; ++i){
-			rev_debug_print(lines[i]->raw_str, lines[i]->a, lines[i]->b);
-		}
-	}
-	fclose(fp);
-	return NULL;
-}
-
-
-char* test_tick_many(){
-	int i = 0;
-	int len = 3;
-	char* test[] = {
-		"spinelessness prayed doppelgangers notabilities syllabification unflinching",
-		"coccyx Msgr environments subjecting Duroc ibis  fetus whack wile",
-		"nippy demoed pretax voltmeters bougainvillea garish weedkillers",
-	};
-	StrWordRev* w_list[len];
-
-	for (i = 0; i < len; ++i){
-		w_list[i] = new_swr(test[i]);
-	}
-
-	while (!all_complete(w_list, len)){
-		for (i = 0; i < len; ++i){
-			printf("\033[1A");
-			printf("\033[1A");
-			printf("\r");
-		}
-		for (i = 0; i < len; ++i){
-			if (w_list[i]->state != COMPLETE){
-				tick_reverse_word(w_list[i]);
-			}
-			rev_debug_print(w_list[i]->raw_str, w_list[i]->a, w_list[i]->b);
-		}
-		usleep(50000);
-	}
-	return NULL;
-
-}
 
 char* test_tick_reverse_word(){
 	char* test_sentence = "this is a test of some kind.";
+	char* reversed = "kind. some of test a is this";
 	StrWordRev* swr = new_swr(test_sentence);
-
-	printf("Attempting to print new swr.\n");
-	rev_debug_print(swr->raw_str, swr->a, swr->b);
-	// return NULL;
 
 	while (swr->state != COMPLETE){
 		tick_reverse_word(swr);
-		rev_debug_print(swr->raw_str, swr->a, swr->b);
 	}
-	return swr->raw_str;
+	if (strcmp(swr->raw_str, reversed)){
+		log_err("Strings not equal. Raw: '%s', reversed: '%s'", swr->raw_str, reversed);
+	}
+	mu_assert(!strcmp(swr->raw_str, reversed), "The reversed string and the result are not equal.");
+	return NULL;
+}
+
+char* test_space_or_null(){
+	int i = 0;
+	for (i = 0; i < 128; i++){
+		if (i == ' ' || i == '\0'){
+			mu_assert(space_or_null(i) == 1, "space_or_null didn't recognize a space or a null");
+		} else {
+			mu_assert(space_or_null(i) == 0, "space_or_null incorrectly recognized a space or a null");
+		}
+	}
+	return NULL;
+}
+
+char* test_check_bounds(){
+	char* example_str = "this is a test sentence composed of words.";
+	char* a = (char*)example_str+5;
+	char* b = (char*)example_str+33;
+	mu_assert(check_bounds(example_str, a, b), "check_bounds incorrectly classified the given string as invalid.");
+	a = (char*)example_str+15;
+	b = (char*)example_str+10;
+	mu_assert(!check_bounds(example_str, a, b), "check_bounds incorrectly classified the given string as valid.");
+	return NULL;
+}
+
+char* test_get_word_pos(){
+	int i = 0;
+	char* test_sentence = "this is a test sentence composed of words.";
+	int word_indices[8] = {0, 5, 8, 10, 15, 24, 33, 36};
+	for (i = 0; i < 8; i++){
+		char *tmp = get_word_pos(test_sentence, i);
+		if (tmp-test_sentence != word_indices[i]){
+			log_err("tmp: %ld, test_sentence: %ld, Returned %ld, should be %d", (long)tmp, (long)test_sentence, tmp-test_sentence, word_indices[i]);
+		};
+		mu_assert((tmp-test_sentence == word_indices[i]), "Returned incorrect position.");
+	}
+	return NULL;
 }
 
 
-RUN_TESTS(test_tick_file_many);
+char* all_tests(){
+	mu_suite_start();
+
+	mu_run_test(test_space_or_null);
+	mu_run_test(test_check_bounds);
+	mu_run_test(test_get_word_pos);
+	mu_run_test(test_tick_reverse_word);
+	return NULL;
+}
+
+RUN_TESTS(all_tests);
